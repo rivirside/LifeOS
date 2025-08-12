@@ -713,7 +713,6 @@ Start building your personal documentation system!`;
     async loadExistingProject() {
         try {
             await this.loadProject();
-            this.showMainApp();
         } catch (error) {
             // Error handling is already in loadProject
         }
@@ -826,6 +825,7 @@ Start building your personal documentation system!`;
             }
 
             // Update UI
+            this.showMainApp();
             this.renderSidebar();
             this.loadHomePage();
 
