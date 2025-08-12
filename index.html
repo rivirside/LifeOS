@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Documentation Profile</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <!-- Launch Screen -->
+    <div id="launch-screen" class="launch-screen">
+        <div class="launch-content">
+            <h1>Personal Documentation Profile</h1>
+            <p class="launch-subtitle">Organize your life's documentation with markdown-powered sections and pages</p>
+            
+            <div class="launch-description">
+                <h2>What is this?</h2>
+                <p>A powerful tool to create and manage your personal documentation using a hierarchical structure of sections, subsections, and markdown pages. Perfect for organizing academic work, professional portfolios, creative projects, and more.</p>
+                
+                <h3>Features:</h3>
+                <ul>
+                    <li>📁 <strong>Hierarchical Organization</strong> - Create nested sections and subsections</li>
+                    <li>📝 <strong>Markdown Support</strong> - Write rich content with markdown formatting</li>
+                    <li>💾 <strong>File System Integration</strong> - Load and save directly to your computer</li>
+                    <li>🎨 <strong>Resizable Interface</strong> - Customize the sidebar width to your needs</li>
+                    <li>✏️ <strong>Live Editing</strong> - Edit section names and page content in real-time</li>
+                </ul>
+            </div>
+
+            <div class="launch-actions">
+                <h2>Get Started</h2>
+                <p>Choose how you'd like to begin:</p>
+                
+                <div class="launch-buttons">
+                    <button id="load-existing-btn" class="btn btn-primary btn-large">
+                        <span class="btn-icon">📂</span>
+                        <span class="btn-text">
+                            <strong>Load Existing Project</strong>
+                            <small>Open a folder with existing markdown files</small>
+                        </span>
+                    </button>
+                    
+                    <button id="create-new-btn" class="btn btn-success btn-large">
+                        <span class="btn-icon">✨</span>
+                        <span class="btn-text">
+                            <strong>Create New Project</strong>
+                            <small>Start fresh in a new or existing folder</small>
+                        </span>
+                    </button>
+                </div>
+
+                <div class="launch-note">
+                    <p><strong>Note:</strong> This app works best in Chrome, Edge, or other Chromium-based browsers for full file system access.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App (hidden initially) -->
+    <div id="main-app" class="app-container" style="display: none;">
+        <header class="header">
+            <h1>Personal Documentation Profile</h1>
+            <div class="header-actions">
+                <button id="load-project-btn" class="btn btn-success">Load Project</button>
+                <button id="save-project-btn" class="btn btn-success" style="display: none;">Save Project</button>
+                <button id="new-project-btn" class="btn btn-info">New Project</button>
+                <button id="new-section-btn" class="btn btn-primary">New Section</button>
+                <button id="new-page-btn" class="btn btn-secondary">New Page</button>
+                <button id="edit-mode-btn" class="btn btn-toggle">Edit Mode</button>
+            </div>
+        </header>
+        
+        <div class="main-content">
+            <aside class="sidebar" id="sidebar">
+                <nav id="sidebar-nav">
+                    <!-- Dynamic sidebar will be generated here -->
+                </nav>
+            </aside>
+            <div class="sidebar-resizer" id="sidebar-resizer"></div>
+            
+            <main class="content-area">
+                <div id="view-mode" class="content-view">
+                    <div id="markdown-content">
+                        <h1>Welcome to Your Personal Documentation Profile</h1>
+                        <p>Create sections and pages to organize your life's documentation.</p>
+                        <p>Click "New Section" to get started!</p>
+                    </div>
+                </div>
+                
+                <div id="edit-mode" class="content-edit" style="display: none;">
+                    <div class="edit-header">
+                        <input type="text" id="page-title" placeholder="Page Title" class="title-input">
+                        <div class="edit-actions">
+                            <button id="save-btn" class="btn btn-success">Save</button>
+                            <button id="cancel-btn" class="btn btn-secondary">Cancel</button>
+                        </div>
+                    </div>
+                    <textarea id="markdown-editor" placeholder="Write your markdown content here..."></textarea>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal for creating new sections -->
+    <div id="section-modal" class="modal">
+        <div class="modal-content">
+            <h3>Create New Section</h3>
+            <div class="form-group">
+                <label for="section-location">Location:</label>
+                <select id="section-location">
+                    <option value="main">Main Section</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="section-name">Section Name:</label>
+                <input type="text" id="section-name" placeholder="Section Name (e.g., academic, professional)">
+            </div>
+            <div class="modal-actions">
+                <button id="create-section-btn" class="btn btn-primary">Create</button>
+                <button id="cancel-section-btn" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for creating new pages -->
+    <div id="page-modal" class="modal">
+        <div class="modal-content">
+            <h3>Create New Page</h3>
+            <select id="parent-section">
+                <option value="">Select Section or Subsection</option>
+            </select>
+            <input type="text" id="page-name" placeholder="Page Name">
+            <div class="modal-actions">
+                <button id="create-page-btn" class="btn btn-primary">Create</button>
+                <button id="cancel-page-btn" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for editing section names -->
+    <div id="edit-section-modal" class="modal">
+        <div class="modal-content">
+            <h3>Edit Section Name</h3>
+            <div class="form-group">
+                <label for="edit-section-name">Section Name:</label>
+                <input type="text" id="edit-section-name" placeholder="Section Name">
+            </div>
+            <div class="modal-actions">
+                <button id="save-section-btn" class="btn btn-primary">Save</button>
+                <button id="cancel-edit-section-btn" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
