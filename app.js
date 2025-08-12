@@ -538,26 +538,7 @@ class DocumentationApp {
 
     loadHomePage() {
         this.currentPage = null;
-        const homeContent = `# Welcome to Your Personal Documentation Profile
-
-Create sections and pages to organize your life's documentation.
-
-## Getting Started
-
-1. Click **"New Section"** to create a main category (e.g., academic, professional, creative)
-2. Click **"New Page"** to add content within a section
-3. Use **"Edit Mode"** to modify existing pages
-4. Write in Markdown format for rich formatting
-
-## Markdown Tips
-
-- Use \`#\` for headers
-- Use \`**bold**\` for **bold text**
-- Use \`*italic*\` for *italic text*
-- Use \`-\` for bullet points
-- Use \`1.\` for numbered lists
-
-Start building your personal documentation system!`;
+        const homeContent = `# Welcome to Your Personal Documentation Profile\n\nCreate sections and pages to organize your life\'s documentation.\n\n## Getting Started\n\n1. Click **"New Section"** to create a main category (e.g., academic, professional, creative)\n2. Click **"New Page"** to add content within a section\n3. Use **"Edit Mode"** to modify existing pages\n4. Write in Markdown format for rich formatting\n\n## Markdown Tips\n\n- Use \`#\` for headers\n- Use \`**bold**\` for **bold text**\n- Use \`*italic*\` for *italic text*\n- Use \`-\` for bullet points\n- Use \`1.\` for numbered lists\n\nStart building your personal documentation system!`;
 
         document.getElementById('markdown-content').innerHTML = marked.parse(homeContent);
         this.renderSidebar();
@@ -718,6 +699,45 @@ Start building your personal documentation system!`;
         }
     }
 
+    async createNewProject() {
+        try {
+            // Check if File System Access API is supported
+            if (!window.showDirectoryPicker) {
+                alert('File System Access API is not supported in this browser. Please use Chrome, Edge, or another Chromium-based browser.');
+                return;
+            }
+
+            // Show directory picker for new project
+            const directoryHandle = await window.showDirectoryPicker();
+            this.projectHandle = directoryHandle;
+
+            console.log('Creating new project in:', directoryHandle.name);
+
+            // Start with empty data
+            this.data = this.getEmptyData();
+
+            // Create a welcome README file
+            await this.createWelcomeFile();
+            await this.createSampleProjectContent();
+
+            // Show save button
+            const saveBtn = document.getElementById('save-project-btn');
+            if (saveBtn) {
+                saveBtn.style.display = 'inline-block';
+            }
+
+            // Show main app
+            this.showMainApp();
+
+            console.log('New project created successfully');
+        } catch (error) {
+            if (error.name !== 'AbortError') {
+                console.error('Error creating new project:', error);
+                alert('Error creating new project: ' + error.message);
+            }
+        }
+    }
+
     async createSampleProjectContent() {
         console.log('Creating sample project content...');
 
@@ -801,75 +821,9 @@ Start building your personal documentation system!`;
         this.loadPage(page1Id); // Load the first page
     }
 
-    async createNewProject() {
-        try {
-            // Check if File System Access API is supported
-            if (!window.showDirectoryPicker) {
-                alert('File System Access API is not supported in this browser. Please use Chrome, Edge, or another Chromium-based browser.');
-                return;
-            }
-
-            // Show directory picker for new project
-            const directoryHandle = await window.showDirectoryPicker();
-            this.projectHandle = directoryHandle;
-
-            console.log('Creating new project in:', directoryHandle.name);
-
-            // Start with empty data
-            this.data = this.getEmptyData();
-
-            // Create a welcome README file
-            await this.createWelcomeFile();
-            await this.createSampleProjectContent();
-
-            // Show save button
-            const saveBtn = document.getElementById('save-project-btn');
-            if (saveBtn) {
-                saveBtn.style.display = 'inline-block';
-            }
-
-            // Show main app
-            this.showMainApp();
-
-            console.log('New project created successfully');
-        } catch (error) {
-            if (error.name !== 'AbortError') {
-                console.error('Error creating new project:', error);
-                alert('Error creating new project: ' + error.message);
-            }
-        }
-    }
-
     async createWelcomeFile() {
         try {
-            const welcomeContent = `# Welcome to Your Personal Documentation Profile
-
-This is your new documentation project! Here's how to get started:
-
-## Getting Started
-
-1. **Create Sections** - Click "New Section" to create main categories (e.g., Academic, Professional, Creative)
-2. **Add Subsections** - Create nested sections for better organization
-3. **Write Pages** - Click "New Page" to add content within any section
-4. **Edit Content** - Use the "Edit Mode" button to modify pages with Markdown
-
-## Markdown Tips
-
-- Use \`#\` for headers (# Main Header, ## Sub Header)
-- Use \`**bold**\` for **bold text**
-- Use \`*italic*\` for *italic text*
-- Use \`-\` for bullet points
-- Use \`1.\` for numbered lists
-- Use \`\`\`code\`\`\` for code blocks
-
-## Features
-
-- **Hierarchical Organization** - Unlimited nesting of sections
-- **Live Preview** - See your markdown rendered in real-time
-- **File System Integration** - All changes save directly to your files
-- **Resizable Interface** - Drag the sidebar edge to resize
-
-Start building your personal documentation system!`;
+            const welcomeContent = `# Welcome to Your Personal Documentation Profile\n\nThis is your new documentation project! Here\'s how to get started:\n\n## Getting Started\n\n1. **Create Sections** - Click "New Section" to create main categories (e.g., Academic, Professional, Creative)\n2. **Add Subsections** - Create nested sections for better organization\n3. **Write Pages** - Click "New Page" to add content within any section\n4. **Edit Content** - Use the "Edit Mode" button to modify pages with Markdown\n\n## Markdown Tips\n\n- Use \`#\` for headers (# Main Header, ## Sub Header)\n- Use \`**bold**\` for **bold text**\n- Use \`*italic*\` for *italic text*\n- Use \`-\` for bullet points\n- Use \`1.\` for numbered lists\n- Use \`\`\`code\`\`\` for code blocks\n\n## Features\n\n- **Hierarchical Organization** - Unlimited nesting of sections\n- **Live Preview** - See your markdown rendered in real-time\n- **File System Integration** - All changes save directly to your files\n- **Resizable Interface** - Drag the sidebar edge to resize\n\nStart building your personal documentation system!`;
 
             const fileHandle = await this.projectHandle.getFileHandle('README.md', { create: true });
             const writable = await fileHandle.createWritable();
