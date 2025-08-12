@@ -718,6 +718,89 @@ Start building your personal documentation system!`;
         }
     }
 
+    async createSampleProjectContent() {
+        console.log('Creating sample project content...');
+
+        // 1. Create main sample section
+        const mainSectionName = 'Sample Section';
+        const mainSectionId = this.generateId(mainSectionName);
+        const mainSection = {
+            id: mainSectionId,
+            name: mainSectionName,
+            type: 'section',
+            parentId: null,
+            pages: []
+        };
+        this.data.items[mainSectionId] = mainSection;
+        await this.createDirectory(mainSection);
+
+        // 2. Create two sub-sections
+        const subSection1Name = 'Sub-section 1';
+        const subSection1Id = this.generateId(subSection1Name);
+        const subSection1 = {
+            id: subSection1Id,
+            name: subSection1Name,
+            type: 'section',
+            parentId: mainSectionId,
+            pages: []
+        };
+        this.data.items[subSection1Id] = subSection1;
+        await this.createDirectory(subSection1);
+
+        const subSection2Name = 'Sub-section 2';
+        const subSection2Id = this.generateId(subSection2Name);
+        const subSection2 = {
+            id: subSection2Id,
+            name: subSection2Name,
+            type: 'section',
+            parentId: mainSectionId,
+            pages: []
+        };
+        this.data.items[subSection2Id] = subSection2;
+        await this.createDirectory(subSection2);
+
+        // 3. Create pages
+        const page1Name = 'Page 1';
+        const page1Id = this.generateId(page1Name);
+        const page1 = {
+            id: page1Id,
+            title: page1Name,
+            content: `# ${page1Name}\n\nThis is the first sample page.`,
+            parentId: subSection1Id
+        };
+        this.data.pages[page1Id] = page1;
+        subSection1.pages.push(page1Id);
+        await this.savePageToFile(page1);
+
+        const page2Name = 'Page 2';
+        const page2Id = this.generateId(page2Name);
+        const page2 = {
+            id: page2Id,
+            title: page2Name,
+            content: `# ${page2Name}\n\nThis is the second sample page.`,
+            parentId: subSection1Id
+        };
+        this.data.pages[page2Id] = page2;
+        subSection1.pages.push(page2Id);
+        await this.savePageToFile(page2);
+
+        const page3Name = 'Page 3';
+        const page3Id = this.generateId(page3Name);
+        const page3 = {
+            id: page3Id,
+            title: page3Name,
+            content: `# ${page3Name}\n\nThis is the third sample page.`,
+            parentId: subSection2Id
+        };
+        this.data.pages[page3Id] = page3;
+        subSection2.pages.push(page3Id);
+        await this.savePageToFile(page3);
+
+        console.log('Sample content created.');
+        this.renderSidebar();
+        this.loadPage(page1Id); // Load the first page
+    }
+
     async createNewProject() {
         try {
             // Check if File System Access API is supported
@@ -737,6 +820,7 @@ Start building your personal documentation system!`;
 
             // Create a welcome README file
             await this.createWelcomeFile();
+            await this.createSampleProjectContent();
 
             // Show save button
             const saveBtn = document.getElementById('save-project-btn');
@@ -921,29 +1005,24 @@ Start building your personal documentation system!`;
 
     async savePageToFile(page) {
         try {
-            if (page.fileHandle) {
-                // Update existing file
-                const writable = await page.fileHandle.createWritable();
-                await writable.write(page.content);
-                await writable.close();
-                console.log(`Updated: ${page.fileName}`);
+            let parentDirHandle;
+            if (page.parentId && this.data.items[page.parentId] && this.data.items[page.parentId].directoryHandle) {
+                parentDirHandle = this.data.items[page.parentId].directoryHandle;
             } else {
-                // Create new file
-                const parentItem = this.data.items[page.parentId];
-                if (parentItem && parentItem.directoryHandle) {
-                    const fileName = `${page.title}.md`;
-                    const fileHandle = await parentItem.directoryHandle.getFileHandle(fileName, { create: true });
-                    const writable = await fileHandle.createWritable();
-                    await writable.write(page.content);
-                    await writable.close();
-
-                    // Store the handle for future saves
-                    page.fileHandle = fileHandle;
-                    page.fileName = fileName;
-
-                    console.log(`Created: ${fileName}`);
-                }
+                parentDirHandle = this.projectHandle;
             }
+
+            const fileName = page.fileName || `${page.title}.md`;
+            const fileHandle = await parentDirHandle.getFileHandle(fileName, { create: true });
+            const writable = await fileHandle.createWritable();
+            await writable.write(page.content);
+            await writable.close();
+
+            // Store the handle for future saves
+            page.fileHandle = fileHandle;
+            page.fileName = fileName;
+
+            console.log(`Saved: ${fileName}`);
         } catch (error) {
             console.error(`Error saving page ${page.title}:`, error);
         }
@@ -956,6 +1035,14 @@ Start building your personal documentation system!`;
                 const item = this.data.items[itemId];
                 if (!item.directoryHandle) {
                     await this.createDirectory(item);
+                }
+            }
+
+            // Save all pages, which will create new files if needed
+            for (const pageId in this.data.pages) {
+                const page = this.data.pages[pageId];
+                if (!page.fileHandle) {
+                    await this.savePageToFile(page);
                 }
             }
         } catch (error) {
