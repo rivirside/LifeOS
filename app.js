@@ -128,10 +128,18 @@ class DocumentationApp {
         if (saveSectionBtn) saveSectionBtn.addEventListener('click', () => this.saveEditedSection());
         if (cancelEditSectionBtn) cancelEditSectionBtn.addEventListener('click', () => this.hideEditSectionModal());
 
+        // Markdown help modal
+        const markdownHelpBtn = document.getElementById('markdown-help-btn');
+        const closeMarkdownHelpBtn = document.getElementById('close-markdown-help-btn');
+
+        if (markdownHelpBtn) markdownHelpBtn.addEventListener('click', () => this.showMarkdownHelp());
+        if (closeMarkdownHelpBtn) closeMarkdownHelpBtn.addEventListener('click', () => this.hideMarkdownHelp());
+
         // Close modals on outside click
         const sectionModal = document.getElementById('section-modal');
         const pageModal = document.getElementById('page-modal');
         const editSectionModal = document.getElementById('edit-section-modal');
+        const markdownHelpModal = document.getElementById('markdown-help-modal');
 
         if (sectionModal) {
             sectionModal.addEventListener('click', (e) => {
@@ -148,6 +156,12 @@ class DocumentationApp {
         if (editSectionModal) {
             editSectionModal.addEventListener('click', (e) => {
                 if (e.target.id === 'edit-section-modal') this.hideEditSectionModal();
+            });
+        }
+
+        if (markdownHelpModal) {
+            markdownHelpModal.addEventListener('click', (e) => {
+                if (e.target.id === 'markdown-help-modal') this.hideMarkdownHelp();
             });
         }
 
@@ -669,6 +683,20 @@ class DocumentationApp {
         this.currentEditingItemId = null;
     }
 
+    showMarkdownHelp() {
+        const modal = document.getElementById('markdown-help-modal');
+        if (modal) {
+            modal.style.display = 'block';
+        }
+    }
+
+    hideMarkdownHelp() {
+        const modal = document.getElementById('markdown-help-modal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
+    }
+
     saveEditedSection() {
         if (!this.currentEditingItemId) return;
 
@@ -741,307 +769,241 @@ class DocumentationApp {
     async createSampleProjectContent() {
         console.log('Creating sample project content...');
 
-        // 1. Create main sample section
-        const mainSectionName = 'Sample Section';
-        const mainSectionId = this.generateId(mainSectionName);
-        const mainSection = {
-            id: mainSectionId,
-            name: mainSectionName,
+        // 1. Create Profile page (root level)
+        const profilePageId = this.generateId('Profile');
+        const profilePage = {
+            id: profilePageId,
+            title: 'Profile',
+            content: `# My Profile
+
+## About Me
+
+Welcome to my personal documentation profile! This is where I organize and present my life's work across multiple domains.
+
+## Quick Overview
+
+- **Academic**: My educational journey and research projects
+- **Professional**: Work experience and career development
+- **Creative**: Personal projects and creative endeavors
+
+## Current Goals
+
+- [ ] Complete current academic program
+- [ ] Develop new professional skills
+- [ ] Launch creative project
+
+## Contact
+
+- Email: your.email@example.com
+- LinkedIn: [Your LinkedIn Profile](https://linkedin.com/in/yourprofile)
+- GitHub: [Your GitHub](https://github.com/yourusername)
+
+---
+
+*Last updated: ${new Date().toLocaleDateString()}*`,
+            parentId: null
+        };
+        this.data.pages[profilePageId] = profilePage;
+        await this.savePageToFile(profilePage);
+
+        // 2. Create Academic section
+        const academicSectionId = this.generateId('Academic');
+        const academicSection = {
+            id: academicSectionId,
+            name: 'Academic',
             type: 'section',
             parentId: null,
             pages: []
         };
-        this.data.items[mainSectionId] = mainSection;
-        await this.createDirectory(mainSection);
+        this.data.items[academicSectionId] = academicSection;
+        await this.createDirectory(academicSection);
 
-        // 2. Create two sub-sections
-        const subSection1Name = 'Sub-section 1';
-        const subSection1Id = this.generateId(subSection1Name);
-        const subSection1 = {
-            id: subSection1Id,
-            name: subSection1Name,
+        // 2a. Create Institutions subsection
+        const institutionsId = this.generateId('Institutions');
+        const institutions = {
+            id: institutionsId,
+            name: 'Institutions',
             type: 'section',
-            parentId: mainSectionId,
+            parentId: academicSectionId,
             pages: []
         };
-        this.data.items[subSection1Id] = subSection1;
-        await this.createDirectory(subSection1);
+        this.data.items[institutionsId] = institutions;
+        await this.createDirectory(institutions);
 
-        const subSection2Name = 'Sub-section 2';
-        const subSection2Id = this.generateId(subSection2Name);
-        const subSection2 = {
-            id: subSection2Id,
-            name: subSection2Name,
+        // University page
+        const universityPageId = this.generateId('University of Example');
+        const universityPage = {
+            id: universityPageId,
+            title: 'University of Example',
+            content: `# University of Example
+
+## Degree Program
+**Bachelor of Science in Computer Science**  
+*Expected Graduation: May 2024*
+
+## Relevant Coursework
+- Data Structures and Algorithms
+- Software Engineering
+- Database Systems
+- Machine Learning Fundamentals
+
+## Academic Achievements
+- Dean's List: Fall 2022, Spring 2023
+- GPA: 3.7/4.0
+- Relevant Projects: [Link to projects section]
+
+## Key Experiences
+- Research Assistant in AI Lab (2023)
+- Teaching Assistant for Intro to Programming (2022-2023)
+- Member of Computer Science Student Association`,
+            parentId: institutionsId
+        };
+        this.data.pages[universityPageId] = universityPage;
+        institutions.pages.push(universityPageId);
+        await this.savePageToFile(universityPage);
+
+        // 2b. Create Experiences subsection
+        const experiencesId = this.generateId('Experiences');
+        const experiences = {
+            id: experiencesId,
+            name: 'Experiences',
             type: 'section',
-            parentId: mainSectionId,
+            parentId: academicSectionId,
             pages: []
         };
-        this.data.items[subSection2Id] = subSection2;
-        await this.createDirectory(subSection2);
+        this.data.items[experiencesId] = experiences;
+        await this.createDirectory(experiences);
 
-        // 3. Create pages
-        const page1Name = 'Page 1';
-        const page1Id = this.generateId(page1Name);
-        const page1 = {
-            id: page1Id,
-            title: page1Name,
-            content: `# ${page1Name}\n\nThis is the first sample page.`,
-            parentId: subSection1Id
+        // Research experience page
+        const researchPageId = this.generateId('AI Research Lab');
+        const researchPage = {
+            id: researchPageId,
+            title: 'AI Research Lab',
+            content: `# AI Research Lab Experience
+
+## Position
+**Undergraduate Research Assistant**  
+*September 2023 - Present*
+
+## Project Overview
+Working on natural language processing research under Dr. Jane Smith, focusing on sentiment analysis in social media data.
+
+## Responsibilities
+- Data collection and preprocessing
+- Implementation of machine learning models
+- Literature review and analysis
+- Presentation of findings at weekly lab meetings
+
+## Skills Developed
+- Python programming (pandas, scikit-learn, NLTK)
+- Research methodology
+- Technical writing
+- Data visualization
+
+## Outcomes
+- Co-authored paper submitted to ICML 2024
+- Presented poster at university research symposium
+- Gained hands-on experience with large-scale data processing`,
+            parentId: experiencesId
         };
-        this.data.pages[page1Id] = page1;
-        subSection1.pages.push(page1Id);
-        await this.savePageToFile(page1);
+        this.data.pages[researchPageId] = researchPage;
+        experiences.pages.push(researchPageId);
+        await this.savePageToFile(researchPage);
 
-        const page2Name = 'Page 2';
-        const page2Id = this.generateId(page2Name);
-        const page2 = {
-            id: page2Id,
-            title: page2Name,
-            content: `# ${page2Name}\n\nThis is the second sample page.`,
-            parentId: subSection1Id
+        // 3. Create Professional section
+        const professionalSectionId = this.generateId('Professional');
+        const professionalSection = {
+            id: professionalSectionId,
+            name: 'Professional',
+            type: 'section',
+            parentId: null,
+            pages: []
         };
-        this.data.pages[page2Id] = page2;
-        subSection1.pages.push(page2Id);
-        await this.savePageToFile(page2);
+        this.data.items[professionalSectionId] = professionalSection;
+        await this.createDirectory(professionalSection);
 
-        const page3Name = 'Page 3';
-        const page3Id = this.generateId(page3Name);
-        const page3 = {
-            id: page3Id,
-            title: page3Name,
-            content: `# ${page3Name}\n\nThis is the third sample page.`,
-            parentId: subSection2Id
+        // 3a. Create Jobs subsection
+        const jobsId = this.generateId('Jobs');
+        const jobs = {
+            id: jobsId,
+            name: 'Jobs',
+            type: 'section',
+            parentId: professionalSectionId,
+            pages: []
         };
-        this.data.pages[page3Id] = page3;
-        subSection2.pages.push(page3Id);
-        await this.savePageToFile(page3);
+        this.data.items[jobsId] = jobs;
+        await this.createDirectory(jobs);
 
-        console.log('Sample content created.');
-        this.renderSidebar();
-        this.loadPage(page1Id); // Load the first page
-    }
+        // Software intern page
+        const internPageId = this.generateId('Software Development Intern');
+        const internPage = {
+            id: internPageId,
+            title: 'Software Development Intern',
+            content: `# Software Development Intern
 
-    async createWelcomeFile() {
-        try {
-            const welcomeContent = `# Welcome to Your Personal Documentation Profile\n\nThis is your new documentation project! Here\'s how to get started:\n\n## Getting Started\n\n1. **Create Sections** - Click "New Section" to create main categories (e.g., Academic, Professional, Creative)\n2. **Add Subsections** - Create nested sections for better organization\n3. **Write Pages** - Click "New Page" to add content within any section\n4. **Edit Content** - Use the "Edit Mode" button to modify pages with Markdown\n\n## Markdown Tips\n\n- Use \`#\` for headers (# Main Header, ## Sub Header)\n- Use \`**bold**\` for **bold text**\n- Use \`*italic*\` for *italic text*\n- Use \`-\` for bullet points\n- Use \`1.\` for numbered lists\n- Use \`\`\`code\`\`\` for code blocks\n\n## Features\n\n- **Hierarchical Organization** - Unlimited nesting of sections\n- **Live Preview** - See your markdown rendered in real-time\n- **File System Integration** - All changes save directly to your files\n- **Resizable Interface** - Drag the sidebar edge to resize\n\nStart building your personal documentation system!`;
+## Company
+**TechCorp Solutions**  
+*June 2023 - August 2023*
 
-            const fileHandle = await this.projectHandle.getFileHandle('README.md', { create: true });
-            const writable = await fileHandle.createWritable();
-            await writable.write(welcomeContent);
-            await writable.close();
+## Role Overview
+Summer internship focused on full-stack web development, working on the company's main customer portal.
 
-            console.log('Created welcome README.md file');
-        } catch (error) {
-            console.error('Error creating welcome file:', error);
-        }
-    }
+## Key Projects
+### Customer Dashboard Redesign
+- Redesigned user interface using React and Material-UI
+- Improved user experience based on customer feedback
+- Reduced page load times by 40%
 
-    async loadProject() {
-        try {
-            // Check if File System Access API is supported
-            if (!window.showDirectoryPicker) {
-                alert('File System Access API is not supported in this browser. Please use Chrome, Edge, or another Chromium-based browser.');
-                return;
-            }
+### API Integration
+- Integrated third-party payment processing API
+- Implemented error handling and logging
+- Created comprehensive documentation
 
-            // Show directory picker
-            const directoryHandle = await window.showDirectoryPicker();
-            this.projectHandle = directoryHandle;
+## Technologies Used
+- **Frontend**: React, JavaScript, HTML/CSS
+- **Backend**: Node.js, Express
+- **Database**: PostgreSQL
+- **Tools**: Git, Docker, AWS
 
-            console.log('Loading project from:', directoryHandle.name);
+## Achievements
+- Received "Outstanding Intern" award
+- Code contributions merged into production
+- Mentored new intern in final month
 
-            // Clear existing data
-            this.data = this.getEmptyData();
+## Skills Gained
+- Agile development methodology
+- Code review processes
+- Production deployment procedures
+- Team collaboration in remote environment`,
+            parentId: jobsId
+        };
+        this.data.pages[internPageId] = internPage;
+        jobs.pages.push(internPageId);
+        await this.savePageToFile(internPage);
 
-            // Load project structure
-            await this.loadProjectStructure(directoryHandle);
+        // 4. Create Creative section
+        const creativeSectionId = this.generateId('Creative');
+        const creativeSection = {
+            id: creativeSectionId,
+            name: 'Creative',
+            type: 'section',
+            parentId: null,
+            pages: []
+        };
+        this.data.items[creativeSectionId] = creativeSection;
+        await this.createDirectory(creativeSection);
 
-            // Show save button
-            const saveBtn = document.getElementById('save-project-btn');
-            if (saveBtn) {
-                saveBtn.style.display = 'inline-block';
-            }
+        // Personal website project
+        const websiteProjectId = this.generateId('Personal Portfolio Website');
+        const websiteProject = {
+            id: websiteProjectId,
+            title: 'Personal Portfolio Website',
+            content: `# Personal Portfolio Website
 
-            // Update UI
-            this.showMainApp();
-            this.renderSidebar();
-            this.loadHomePage();
+## Project Overview
+A responsive portfolio website showcasing my academic and professional work, built from scratch using modern web technologies.
 
-            console.log('Project loaded successfully');
-        } catch (error) {
-            if (error.name !== 'AbortError') {
-                console.error('Error loading project:', error);
-                alert('Error loading project: ' + error.message);
-            }
-        }
-    }
-
-    async loadProjectStructure(directoryHandle, parentId = null, level = 0) {
-        try {
-            for await (const [name, handle] of directoryHandle.entries()) {
-                if (handle.kind === 'directory') {
-                    // Create section for directory
-                    const sectionId = this.generateId(name);
-                    const section = {
-                        id: sectionId,
-                        name: name,
-                        type: 'section',
-                        parentId: parentId,
-                        pages: [],
-                        directoryHandle: handle
-                    };
-
-                    this.data.items[sectionId] = section;
-                    console.log(`Created section: ${name} (level ${level})`);
-
-                    // Recursively load subdirectories
-                    await this.loadProjectStructure(handle, sectionId, level + 1);
-
-                } else if (handle.kind === 'file' && name.endsWith('.md')) {
-                    // Create page for markdown file
-                    const pageId = this.generateId(name.replace('.md', ''));
-                    const file = await handle.getFile();
-                    const content = await file.text();
-
-                    const page = {
-                        id: pageId,
-                        title: name.replace('.md', ''),
-                        content: content,
-                        parentId: parentId,
-                        fileHandle: handle,
-                        fileName: name
-                    };
-
-                    this.data.pages[pageId] = page;
-
-                    // Add to parent's pages
-                    if (parentId && this.data.items[parentId]) {
-                        if (!this.data.items[parentId].pages) {
-                            this.data.items[parentId].pages = [];
-                        }
-                        this.data.items[parentId].pages.push(pageId);
-                    }
-
-                    console.log(`Loaded page: ${name}`);
-                }
-            }
-        } catch (error) {
-            console.error('Error loading directory structure:', error);
-        }
-    }
-
-    async saveProject() {
-        if (!this.projectHandle) {
-            alert('No project loaded. Please load a project first.');
-            return;
-        }
-
-        try {
-            console.log('Saving project...');
-
-            // Save all pages
-            for (const pageId in this.data.pages) {
-                const page = this.data.pages[pageId];
-                await this.savePageToFile(page);
-            }
-
-            // Create new directories and files as needed
-            await this.createNewStructure();
-
-            console.log('Project saved successfully');
-            alert('Project saved successfully!');
-
-        } catch (error) {
-            console.error('Error saving project:', error);
-            alert('Error saving project: ' + error.message);
-        }
-    }
-
-    async savePageToFile(page) {
-        try {
-            let parentDirHandle;
-            if (page.parentId && this.data.items[page.parentId] && this.data.items[page.parentId].directoryHandle) {
-                parentDirHandle = this.data.items[page.parentId].directoryHandle;
-            } else {
-                parentDirHandle = this.projectHandle;
-            }
-
-            const fileName = page.fileName || `${page.title}.md`;
-            const fileHandle = await parentDirHandle.getFileHandle(fileName, { create: true });
-            const writable = await fileHandle.createWritable();
-            await writable.write(page.content);
-            await writable.close();
-
-            // Store the handle for future saves
-            page.fileHandle = fileHandle;
-            page.fileName = fileName;
-
-            console.log(`Saved: ${fileName}`);
-        } catch (error) {
-            console.error(`Error saving page ${page.title}:`, error);
-        }
-    }
-
-    async createNewStructure() {
-        try {
-            // Create new directories for sections that don't have directory handles
-            for (const itemId in this.data.items) {
-                const item = this.data.items[itemId];
-                if (!item.directoryHandle) {
-                    await this.createDirectory(item);
-                }
-            }
-
-            // Save all pages, which will create new files if needed
-            for (const pageId in this.data.pages) {
-                const page = this.data.pages[pageId];
-                if (!page.fileHandle) {
-                    await this.savePageToFile(page);
-                }
-            }
-        } catch (error) {
-            console.error('Error creating new structure:', error);
-        }
-    }
-
-    async createDirectory(item) {
-        try {
-            let parentHandle = this.projectHandle;
-
-            if (item.parentId) {
-                const parentItem = this.data.items[item.parentId];
-                if (parentItem && parentItem.directoryHandle) {
-                    parentHandle = parentItem.directoryHandle;
-                }
-            }
-
-            const dirHandle = await parentHandle.getDirectoryHandle(item.name, { create: true });
-            item.directoryHandle = dirHandle;
-
-            console.log(`Created directory: ${item.name}`);
-        } catch (error) {
-            console.error(`Error creating directory ${item.name}:`, error);
-        }
-    }
-
-    clearAllData() {
-        if (confirm('Are you sure you want to clear all data? This cannot be undone.')) {
-            localStorage.removeItem('documentation-data');
-            this.data = this.getEmptyData();
-            this.projectHandle = null;
-
-            // Hide save button
-            const saveBtn = document.getElementById('save-project-btn');
-            if (saveBtn) {
-                saveBtn.style.display = 'none';
-            }
-
-            this.renderSidebar();
-            this.loadHomePage();
-            console.log('All data cleared');
-        }
-    }
-}
-
-// Initialize the app
-const app = new DocumentationApp();
+## Features
+- **Responsive Design**: Works seamlessly on desktop, tablet, and mobile
+- **Interactive Elements**: Smooth animations and hover effects
+- **Blog Section**: Tec

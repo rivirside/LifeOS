@@ -62,6 +62,7 @@
         <header class="header">
             <h1>Personal Documentation Profile</h1>
             <div class="header-actions">
+                <button id="markdown-help-btn" class="btn btn-info">📝 Markdown Help</button>
                 <button id="load-project-btn" class="btn btn-success">Load Project</button>
                 <button id="save-project-btn" class="btn btn-success" style="display: none;">Save Project</button>
                 <button id="new-project-btn" class="btn btn-info">New Project</button>
@@ -149,6 +150,66 @@
             <div class="modal-actions">
                 <button id="save-section-btn" class="btn btn-primary">Save</button>
                 <button id="cancel-edit-section-btn" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Markdown Help Modal -->
+    <div id="markdown-help-modal" class="modal">
+        <div class="modal-content markdown-help-content">
+            <h3>📝 Markdown Syntax Guide</h3>
+            <div class="markdown-help-grid">
+                <div class="markdown-section">
+                    <h4>Headers</h4>
+                    <code># Header 1</code><br>
+                    <code>## Header 2</code><br>
+                    <code>### Header 3</code>
+                </div>
+                
+                <div class="markdown-section">
+                    <h4>Text Formatting</h4>
+                    <code>**bold text**</code><br>
+                    <code>*italic text*</code><br>
+                    <code>`inline code`</code>
+                </div>
+                
+                <div class="markdown-section">
+                    <h4>Lists</h4>
+                    <code>- Bullet point</code><br>
+                    <code>1. Numbered item</code><br>
+                    <code>- [ ] Checkbox</code>
+                </div>
+                
+                <div class="markdown-section">
+                    <h4>Links & Images</h4>
+                    <code>[Link text](URL)</code><br>
+                    <code>![Image alt](image.jpg)</code>
+                </div>
+                
+                <div class="markdown-section">
+                    <h4>Code Blocks</h4>
+                    <code>```language<br>code here<br>```</code>
+                </div>
+                
+                <div class="markdown-section">
+                    <h4>Tables</h4>
+                    <code>| Col 1 | Col 2 |<br>|-------|-------|<br>| Data  | Data  |</code>
+                </div>
+                
+                <div class="markdown-section">
+                    <h4>Quotes</h4>
+                    <code>> Blockquote text</code><br>
+                    <code>>> Nested quote</code>
+                </div>
+                
+                <div class="markdown-section">
+                    <h4>Horizontal Rule</h4>
+                    <code>---</code><br>
+                    <code>***</code>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button id="close-markdown-help-btn" class="btn btn-secondary">Close</button>
             </div>
         </div>
     </div>
